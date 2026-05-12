@@ -1,3 +1,9 @@
+import {
+  getTurbidityColorClass,
+  getTurbidityLevel as resolveTurbidityLevel,
+  getTurbidityStatusText,
+} from "@/utils/turbidity-util";
+
 export interface SensorData {
   turbidez: number;
   temperatura?: number;
@@ -577,39 +583,17 @@ class BluetoothService {
     return { ...this.connectionStatus };
   }
 
-  // Métodos de utilidade para turbidez (mantidos para compatibilidade)
+  // Métodos de utilidade para turbidez (delegam à regra única em turbidity-util)
   getTurbidityLevel(turbidity: number): "low" | "medium" | "high" {
-    if (turbidity <= 5) return "low";
-    if (turbidity <= 25) return "medium";
-    return "high";
+    return resolveTurbidityLevel(turbidity);
   }
 
   getTurbidityStatus(turbidity: number): string {
-    const level = this.getTurbidityLevel(turbidity);
-    switch (level) {
-      case "low":
-        return "Ótima";
-      case "medium":
-        return "Boa";
-      case "high":
-        return "Ruim";
-      default:
-        return "Desconhecida";
-    }
+    return getTurbidityStatusText(turbidity);
   }
 
   getTurbidityColor(turbidity: number): string {
-    const level = this.getTurbidityLevel(turbidity);
-    switch (level) {
-      case "low":
-        return "text-green-600";
-      case "medium":
-        return "text-yellow-600";
-      case "high":
-        return "text-red-600";
-      default:
-        return "text-gray-600";
-    }
+    return getTurbidityColorClass(turbidity);
   }
 }
 

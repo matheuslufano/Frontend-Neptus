@@ -13,7 +13,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TurbidityFormSchema } from "@/schemas/turbidity-schema";
-import { getQualityColor } from "@/utils/turbidity-util";
+import {
+  getQualityColor,
+  type TurbidityQualityLabel,
+} from "@/utils/turbidity-util";
 
 import TurbidityHeader from "../../../../components/TurbidityHeader";
 
@@ -94,7 +97,7 @@ const AdditionalParameters = ({
         <div className="flex flex-col gap-4">
           <TurbidityHeader
             turbidityValue={turbidityData.value}
-            quality={turbidityData.quality as "Bom" | "Regular" | "Ruim"}
+            quality={turbidityData.quality as TurbidityQualityLabel}
             timestamp={turbidityData.timestamp}
           />
 

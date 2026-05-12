@@ -29,6 +29,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTanks } from "@/hooks/useTanks";
 import { TurbidityFormSchema } from "@/schemas/turbidity-schema";
+import {
+  getTurbidityStatusText,
+  qualityToPdfTone,
+  type TurbidityQualityLabel,
+} from "@/utils/turbidity-util";
 
 // Tipos para os dados salvos no localStorage
 interface StoredTurbidityEntry {
@@ -57,7 +62,7 @@ interface HistoryItem {
   tankName: string;
   turbidity: number;
   temperature: number;
-  quality: string;
+  quality: TurbidityQualityLabel;
   oxygen: number;
   ph: number;
   ammonia: number;
@@ -83,7 +88,7 @@ const mapStorageToHistoryItem = (item: StoredTurbidityEntry): HistoryItem => ({
   tankName: item.tank || "-",
   turbidity: item.turbidityData?.value ?? 0,
   temperature: item.temperature ?? 0,
-  quality: item.turbidityData?.quality || "-",
+  quality: getTurbidityStatusText(item.turbidityData?.value ?? 0),
   oxygen: item.oxygen ?? 0,
   ph: item.ph ?? 0,
   ammonia: item.ammonia ?? 0,
@@ -407,13 +412,7 @@ const History = () => {
                   <td><strong>${item.tankName}</strong></td>
                   <td>${item.turbidity.toString().replace(".", ",")}</td>
                   <td>${item.temperature.toString().replace(".", ",")}</td>
-                  <td class="quality-${
-                    item.quality === "Bom"
-                      ? "good"
-                      : item.quality === "Regular"
-                      ? "regular"
-                      : "bad"
-                  }">${item.quality}</td>
+                  <td class="quality-${qualityToPdfTone(item.quality)}">${item.quality}</td>
                   <td>${item.oxygen.toString().replace(".", ",")}</td>
                   <td>${item.ph.toString().replace(".", ",")}</td>
                   <td>${item.ammonia.toString().replace(".", ",")}</td>
@@ -510,7 +509,7 @@ const History = () => {
               tankName={item.tankName}
               turbidity={item.turbidity}
               temperature={item.temperature}
-              quality={item.quality as "Bom" | "Regular" | "Ruim"}
+              quality={item.quality}
               oxygen={item.oxygen}
               ph={item.ph}
               ammonia={item.ammonia}
@@ -561,7 +560,7 @@ const History = () => {
             {selectedItem && (
               <TurbidityHeader
                 turbidityValue={selectedItem.turbidity}
-                quality={selectedItem.quality as "Bom" | "Regular" | "Ruim"}
+                quality={selectedItem.quality}
                 timestamp={{
                   time: selectedItem.time,
                   date: selectedItem.date,

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { useTanks } from "@/hooks/useTanks";
-import { getQualityColor } from "@/utils/turbidity-util";
+import { getQualityColor, type TurbidityQualityLabel } from "@/utils/turbidity-util";
 
 import AppButton from "./AppButton";
 import Box from "./Box";
@@ -18,7 +18,7 @@ interface HistoryItemProps {
   tankName: string;
   turbidity: number;
   temperature: number;
-  quality: "Bom" | "Regular" | "Ruim";
+  quality: TurbidityQualityLabel;
   oxygen: number;
   ph: number;
   ammonia: number;
