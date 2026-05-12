@@ -148,10 +148,10 @@ pnpm install
 3. **Configuração do ambiente**
 
 ```bash
-# Copie o template de ambiente
+# crie um arquivo:
 cp .env.example .env.local
 
-# Configure suas variáveis de ambiente
+# PERÇA AS VARIÁNTES DE AMBIENTE PARA O LIDER! PARA PODER FAZER:
 # - Configuração NextAuth
 # - Credenciais Google OAuth
 # - Endpoints da API
