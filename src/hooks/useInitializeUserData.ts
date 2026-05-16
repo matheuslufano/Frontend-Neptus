@@ -15,12 +15,17 @@ import { useUserById } from "./useUsers";
 export const useInitializeUserData = () => {
   const { setUserData, clearUserData } = useAppStore();
   const [userId, setUserId] = useState<string | null>(null);
+  const [userIdResolved, setUserIdResolved] = useState(false);
 
   // Obter ID do usuário do token JWT
   useEffect(() => {
     const fetchUserId = async () => {
-      const id = await getUserIdFromToken();
-      setUserId(id);
+      try {
+        const id = await getUserIdFromToken();
+        setUserId(id);
+      } finally {
+        setUserIdResolved(true);
+      }
     };
 
     fetchUserId();
@@ -39,6 +44,10 @@ export const useInitializeUserData = () => {
   );
 
   useEffect(() => {
+    if (!userIdResolved) {
+      return;
+    }
+
     if (!userId) {
       clearUserData();
       return;
@@ -54,10 +63,11 @@ export const useInitializeUserData = () => {
         permissoes: profile.permissoes,
       });
     }
-  }, [user, profile, userId, setUserData, clearUserData]);
+  }, [user, profile, userId, userIdResolved, setUserData, clearUserData]);
 
   return {
-    isLoading: isLoadingUser || isLoadingProfile,
+    isLoading:
+      !userIdResolved || (Boolean(userId) && (isLoadingUser || isLoadingProfile)),
     user,
     profile,
   };

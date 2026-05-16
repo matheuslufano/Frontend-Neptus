@@ -68,8 +68,19 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         return;
       }
 
-      // Se está online mas NÃO autenticado, redireciona para login
+      // Online sem sessão NextAuth: evita logout falso enquanto a sessão hidrata
+      // ou após operações longas, se o cache offline ainda for válido.
       if (isOnline && status === "unauthenticated") {
+        const cacheStillValid =
+          cachedUser != null && validateOfflineSession();
+        if (cacheStillValid) {
+          console.log(
+            "✅ Online sem sessão NextAuth imediata — cache offline válido, mantendo acesso"
+          );
+          setCanAccess(true);
+          setIsChecking(false);
+          return;
+        }
         console.log("🔒 Online mas não autenticado - redirecionando para login");
         setCanAccess(false);
         setIsChecking(false);
