@@ -64,7 +64,7 @@ const PerfisPage = () => {
       <OnlineGuard>
         <main className="space-y-5">
           <PageHeader
-            title="Gerenciamento de Perfis"
+            title="Gerenciamento de Perfis!"
             description="Gerencie os perfis de acesso do sistema"
           />
           <div className="flex justify-center">
