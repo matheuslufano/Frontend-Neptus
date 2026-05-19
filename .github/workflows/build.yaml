@@ -23,7 +23,7 @@ jobs:
       - name: 📋 Checando a existência dos arquivos obrigatórios
         run: |
           # Loop de verificação dos arquivos obrigatórios:
-          for file in Prod.dockerfile .build.env .deploy.env; do
+          for file in Prod.dockerfile env/.build.env env/.deploy.env; do
             if [ ! -f "$file" ]; then
               echo "::error file=$file::Arquivo '$file' não encontrado!"
               echo "⛔ Pipeline interrompida devido a arquivos faltantes. Parece que você não criou o arquivo '$file'. Caso tenha dúvida vá no Readme inical da Organização Princial!"
@@ -44,29 +44,29 @@ jobs:
           fi     
           
 
-      - name: 📋 Verificando se o arquivo '.deploy.env' está com as informações obrigatórias necessárias...
+      - name: 📋 Verificando se o arquivo 'env/.deploy.env' está com as informações obrigatórias necessárias...
         if: success()
         run: |
-          if ! grep -q "NOME_DO_PROJETO=" ".deploy.env"; then
-            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'NOME_DO_PROJETO' em seu arquivo: .deploy.env ."
+          if ! grep -q "NOME_DO_PROJETO=" "env/.deploy.env"; then
+            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'NOME_DO_PROJETO' em seu arquivo: env/.deploy.env ."
             exit 1
           fi
           
 
-          if ! grep -q "DOCKER_USERNAME=" ".deploy.env"; then
-            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'DOCKER_USERNAME' em seu arquivo: .deploy.env ."
+          if ! grep -q "DOCKER_USERNAME=" "env/.deploy.env"; then
+            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'DOCKER_USERNAME' em seu arquivo: env/.deploy.env ."
             exit 1
           fi
           
 
-          if ! grep -q "DOCKER_HUB_REPOSITORY_NAME=" ".deploy.env"; then
-            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'DOCKER_HUB_REPOSITORY_NAME' em seu arquivo: .deploy.env ."
+          if ! grep -q "DOCKER_HUB_REPOSITORY_NAME=" "env/.deploy.env"; then
+            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'DOCKER_HUB_REPOSITORY_NAME' em seu arquivo: env/.deploy.env ."
             exit 1
           fi
           
 
-          if ! grep -q "DOCKER_TOKEN_ACCESS=" ".deploy.env"; then
-            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'DOCKER_TOKEN_ACCESS' em seu arquivo: .deploy.env ."
+          if ! grep -q "DOCKER_TOKEN_ACCESS=" "env/.deploy.env"; then
+            echo "::error::⛔ Pipeline interrompida. Você precisa adicionar a variável 'DOCKER_TOKEN_ACCESS' em seu arquivo: env/.deploy.env ."
             exit 1
           fi
           
@@ -142,10 +142,10 @@ jobs:
       - name: Preparando tudo para a criação da Imagem da aplicação
         run: |
           resolved_env=".build.resolved.env"
-          cp .build.env $resolved_env
+          cp env/.build.env $resolved_env
 
           # Extraindo os placeholders no formato @NOME_SEGREDO@
-          vars=$(grep -oE '@[A-Z0-9_]+@' .build.env | tr -d '@' | sort -u)
+          vars=$(grep -oE '@[A-Z0-9_]+@' env/.build.env | tr -d '@' | sort -u)
 
           # Secrets disponíveis em JSON
           ALL_SECRETS='${{ toJson(secrets) }}'
@@ -165,10 +165,10 @@ jobs:
         id: preparando-arquivo-deploy-secrets
         run: |
           resolved_deploy_env=".deploy.resolved.env"
-          cp .deploy.env $resolved_deploy_env
+          cp env/.deploy.env $resolved_deploy_env
 
           # Extraindo os placeholders no formato @NOME_SEGREDO@
-          vars=$(grep -oE '@[A-Z0-9_]+@' .deploy.env | tr -d '@' | sort -u)
+          vars=$(grep -oE '@[A-Z0-9_]+@' env/.deploy.env | tr -d '@' | sort -u)
 
           # Secrets disponíveis em JSON
           ALL_SECRETS='${{ toJson(secrets) }}'
@@ -194,7 +194,7 @@ jobs:
                 # echo "${key}=${value}"
               echo "${key}=${value}" >> $GITHUB_OUTPUT
             fi
-          done < .deploy.env
+          done < env/.deploy.env
 
 
       - name: ⛴️ Login no Docker Hub
@@ -229,8 +229,8 @@ jobs:
           PROJETO_PATH="projetos/$NOME_PROJETO/${{ steps.deploy_env.outputs.DOCKER_HUB_REPOSITORY_NAME }}"
           
           NOVA_SECRET="${DOCKER_USER}_DOCKER_TOKEN_ACCESS"
-          sed -i "s/DOCKER_TOKEN_ACCESS=@[^@]*@/DOCKER_TOKEN_ACCESS=@${NOVA_SECRET}@/g" .deploy.env
-          echo -e "\nTAG=$IMAGE_TAG" >> .deploy.env
+          sed -i "s/DOCKER_TOKEN_ACCESS=@[^@]*@/DOCKER_TOKEN_ACCESS=@${NOVA_SECRET}@/g" env/.deploy.env
+          echo -e "\nTAG=$IMAGE_TAG" >> env/.deploy.env
 
 
           echo ${{ secrets.TAG_GITHUB_TOKEN }}   | gh auth login --with-token
@@ -270,8 +270,8 @@ jobs:
           fi
 
           # Copiar arquivo
-          echo "📄 Copiando .deploy.env para $PROJETO_PATH/"
-          cp ../.deploy.env "$PROJETO_PATH/"        
+          echo "📄 Copiando env/.deploy.env para $PROJETO_PATH/"
+          cp ../env/.deploy.env "$PROJETO_PATH/"        
 
 
           # Commit e push
@@ -279,7 +279,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "ℹ️  Nenhuma alteração para commitar"
           else
-            git commit -m "feat: Adiciona .deploy.env em $PROJETO_PATH"
+            git commit -m "feat: Adiciona env/.deploy.env em $PROJETO_PATH"
             git push origin main
             echo "✅ Arquivo enviado com sucesso!"
           fi

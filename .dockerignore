@@ -31,11 +31,12 @@ Thumbs.db
 *.bak
 
 # Pasta do Docker e arquivos do Docker:
-docker/.env.example
 docker/BuildDockerfile
 docker/compose.yaml
 docker/Dockerfile
 docker/README.md
+env/.env*
+env/docker.env
 
 # Node Modules
 node_modules/

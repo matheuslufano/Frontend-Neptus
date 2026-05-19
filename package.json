@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0",
-    "build": "next build",
-    "start": "next start",
+    "prepare-env": "node scripts/prepare-env.mjs",
+    "dev": "npm run prepare-env && next dev -H 0.0.0.0",
+    "build": "npm run prepare-env && next build",
+    "start": "npm run prepare-env && next start",
     "lint": "next lint",
     "esp32-simulator": "node esp32-simulator.js"
   },

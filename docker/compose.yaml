@@ -2,7 +2,7 @@ name: neptus
 
 services:
   frontend-dev:
-    image: frontend-dev:${IMAGE_TAG}
+    image: frontend-dev:${IMAGE_TAG:-local}
     ports:
       - "3000:3000"
     build:
@@ -20,7 +20,7 @@ services:
     
 
   frontend-build:
-    image: frontend:${IMAGE_TAG}
+    image: frontend:${IMAGE_TAG:-local}
     ports:
       - "80:80"
       - "443:443"
@@ -34,4 +34,4 @@ services:
 
 secrets:
   env_secrets:
-    file: ./.env  
+    file: ../env/docker.env
