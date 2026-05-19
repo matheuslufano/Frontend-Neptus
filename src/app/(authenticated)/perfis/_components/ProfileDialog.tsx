@@ -130,7 +130,7 @@ interface ProfileDialogProps {
 }
 
 function normalizePermissionSet(permissoes: string[]) {
-  return new Set(permissoes.map((p) => p.toUpperCase()));
+  return new Set(permissoes);
 }
 
 export const ProfileDialog = ({
@@ -179,7 +179,7 @@ export const ProfileDialog = ({
         setIsEditMode(true);
         form.reset({
           nome: profile.nome,
-          permissoes: profile.permissoes.map((p) => p.toUpperCase()),
+          permissoes: profile.permissoes,
         });
       } else {
         setIsEditMode(false);
@@ -233,13 +233,11 @@ export const ProfileDialog = ({
   };
 
   const togglePermission = (permission: string) => {
-    const key = permission.toUpperCase();
     const current = form.getValues("permissoes");
-    const upper = current.map((p) => p.toUpperCase());
-    if (upper.includes(key)) {
-      setPermissions(current.filter((p) => p.toUpperCase() !== key));
+    if (current.includes(permission)) {
+      setPermissions(current.filter((p) => p !== permission));
     } else {
-      setPermissions([...current, key]);
+      setPermissions([...current, permission]);
     }
   };
 
@@ -253,16 +251,16 @@ export const ProfileDialog = ({
   };
 
   const clearAllInGroup = (group: PermissionGroup) => {
-    const remove = new Set(group.permissions.map((p) => p.id.toUpperCase()));
+    const remove = new Set(group.permissions.map((p) => p.id));
     setPermissions(
       form
         .getValues("permissoes")
-        .filter((p) => !remove.has(p.toUpperCase()))
+        .filter((p) => !remove.has(p))
     );
   };
 
   const countSelectedInGroup = (group: PermissionGroup) =>
-    group.permissions.filter((p) => selectedSet.has(p.id.toUpperCase()))
+    group.permissions.filter((p) => selectedSet.has(p.id))
       .length;
 
   const isLoading =
@@ -405,7 +403,7 @@ export const ProfileDialog = ({
                           <div className="space-y-1 px-2 py-2">
                             {group.permissions.map((perm) => {
                               const checked = selectedSet.has(
-                                perm.id.toUpperCase()
+                                perm.id
                               );
                               return (
                                 <label
